@@ -1,26 +1,17 @@
-import time
+from dataclasses import dataclass
 from .core import Player, Dealer
 
+@dataclass()
+class Score:
+    wins: int
+    ties: int
+    losses: int
+    surrenders: int
 
-# def print_cards(hand):
-    # lines = ['  '] * 4
-    # for v in hand:
-        # lines[0] += "   ____ "
-        # v = str(v)
-        # if len(v) == 2:
-            # lines[1] += "  |{}  |".format(v)
-        # else:
-            # lines[1] += "  |{}   |".format(v)
-        # lines[2] += "  |    |"
-        # lines[3] += "  |____|"
 
-    # for l in lines:
-        # print(l)
+class Game:
+    """Object that represents a game of Blackjack"""
 
-class Game():
-    """Object that represents a game of Blackjack
-
-    """
     WIN_1ST_RND = 2.5
     WIN = 2
     LOSS = 0
@@ -33,31 +24,23 @@ class Game():
         self.win_state = -1
 
         # Score counters
-        self.score = {  
-            "wins": 0,
-            "ties": 0,
-            "losses": 0,
-            "surrenders": 0
-        }
+        self.score = {"wins": 0, "ties": 0, "losses": 0, "surrenders": 0}
 
     def __repr__(self):
         return "Game( {}, {}, Score({}))".format(
-            self.dealer,
-            self.player,
-            self.score_string()
+            self.dealer, self.player, self.score_string()
         )
 
     def score_string(self):
         return "\nWins: {}, losses: {}, ties: {}, surrenders: {}\n".format(
             self.score["wins"],
-            self.score["losses"], 
+            self.score["losses"],
             self.score["ties"],
-            self.score["surrenders"]
+            self.score["surrenders"],
         )
 
     def print_score(self):
-        """Method to print the current score
-        """
+        """Method to print the current score"""
         print(self.score_string())
 
     def update_score(self):
@@ -75,7 +58,6 @@ class Game():
 
         else:
             raise ValueError("Invalid game win state")
-        
 
     def clear_round(self):
         self.dealer.clear()
@@ -88,12 +70,12 @@ class Game():
 
     def dcard(self):
         return self.dealer.hand[0]
-    
+
     def hit(self):
         self.player.hit()
 
     def check_current_round(self):
-        """Check the result of the current round 
+        """Check the result of the current round
         against win conditions
         """
         if self.win_state != -1:
@@ -113,7 +95,7 @@ class Game():
         elif self.dealer < self.player:
             print("You win!!!")
             self.win_state = self.WIN
-            
+
         elif self.dealer > self.player.sum:
             print("You lost :(")
             self.win_state = self.LOSS
@@ -129,15 +111,14 @@ class Game():
         self.clear_round()
         self.deal()
         print("Dealer's hand: {}, *".format(self.dcard()))
-        self.dealer.print_cards(print_one=True)
+        self.dealer.print_cards()
 
         # Game loop
         while (self.player <= 21).any():
             print(self.player)
             self.player.print_cards()
             if len(self.player.hand) == 2:
-                """First 2 hand dealt - check for 21 - able to surrender if hand are bad
-                """
+                """First 2 hand dealt - check for 21 - able to surrender if hand are bad"""
                 if 21 in self.player.sum:
                     self.win_state = self.WIN_1ST_RND
                     break
@@ -176,5 +157,3 @@ class Game():
 
         # Update score counter
         self.update_score()
-
-
