@@ -141,12 +141,12 @@ class Game:
                     print("Can only surrender before you hit!")
 
         # If there are multiple sums, find the right one
-        self.player.check_sum()
+        self.player.check()
         print(self.player)
 
         # Dealer do his thing
         print("\nDealer reveal!")
-        self.dealer.check_cards()
+        self.dealer.check()
         print(self.dealer)
         self.dealer.print_cards()
 

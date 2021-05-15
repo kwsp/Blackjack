@@ -1,17 +1,21 @@
+from typing import List, Union
 import numpy as np
+import random
 
 
-deck = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"]
+Card = Union[str, int]
+
+deck: List[Card] = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"]
 JQK = ["J", "Q", "K"]
 deck_n = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
 
 
-def _new_card():
-    return deck[np.random.randint(13)]
+def _new_card() -> Card:
+    return random.choice(deck)
 
 
-def _print_cards(hand, print_one=False, pad_spaces=4):
-    lines = ["  "] * pad_spaces
+def _print_cards(hand: List[Card], print_one=False):
+    lines = ["  ", "  ", "  ", "  "]
     if print_one:
         hand = hand[:1]
 
@@ -33,27 +37,26 @@ class BasePlayer:
     def __init__(self):
         self.hand = []
         self.sum = np.zeros(1, dtype=np.uint8)
-        self.pad_spaces = 4
 
     def __repr__(self):
         return "{}: hand {}, sum {})".format(
             str(self.__class__).split(".")[-1].split("'")[0], self.hand, self.sum
         )
 
-    def __eq__(self, value):
-        return self.sum == value
+    def __eq__(self, other):
+        return self.sum == other
 
-    def __gt__(self, value):
-        return self.sum > value
+    def __gt__(self, other):
+        return self.sum > other
 
-    def __ge__(self, value):
-        return self.sum >= value
+    def __ge__(self, other):
+        return self.sum >= other
 
-    def __lt__(self, value):
-        return self.sum < value
+    def __lt__(self, other):
+        return self.sum < other
 
-    def __le__(self, value):
-        return self.sum <= value
+    def __le__(self, other):
+        return self.sum <= other
 
     def __call__(self):
         return {
@@ -95,7 +98,7 @@ class BasePlayer:
                 breakpoint()
                 raise TypeError("Unrecognised type in hand array.")
 
-    def print_cards(self, print_one=False):
+    def print_cards(self):
         _print_cards(self.hand)
 
     def clear(self):
@@ -108,12 +111,14 @@ class Player(BasePlayer):
     def __init__(self):
         super().__init__()
 
-    def check_sum(self):
+    def check(self) -> int:
         idx = self.sum <= 21
-        if (idx).any():
+        if idx.any():
             self.sum = self.sum[idx][-1]
         else:
             self.sum = self.sum.min()
+
+        return self.sum
 
 
 class Dealer(BasePlayer):
@@ -124,9 +129,8 @@ class Dealer(BasePlayer):
 
     def __init__(self):
         super().__init__()
-        self.pad_spaces = 6
 
-    def check_cards(self):
+    def check(self) -> int:
         """Check if the dealer needs to draw new hand"""
         while True:
 
@@ -152,5 +156,7 @@ class Dealer(BasePlayer):
                     self.sum = self.sum[0]
                     break
 
+        return self.sum
+
     def print_cards(self):
-        _print_cards(self.hand, print_one=True, pad_spaces=4)
+        _print_cards(self.hand, print_one=True)
