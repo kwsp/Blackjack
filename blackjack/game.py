@@ -1,12 +1,13 @@
 from dataclasses import dataclass
 from .core import Player, Dealer
 
+
 @dataclass()
 class Score:
-    wins: int
-    ties: int
-    losses: int
-    surrenders: int
+    wins: int = 0
+    losses: int = 0
+    ties: int = 0
+    surrenders: int = 0
 
 
 class Game:
@@ -24,7 +25,7 @@ class Game:
         self.win_state = -1
 
         # Score counters
-        self.score = {"wins": 0, "ties": 0, "losses": 0, "surrenders": 0}
+        self.score = Score()
 
     def __repr__(self):
         return "Game( {}, {}, Score({}))".format(
@@ -33,10 +34,7 @@ class Game:
 
     def score_string(self):
         return "\nWins: {}, losses: {}, ties: {}, surrenders: {}\n".format(
-            self.score["wins"],
-            self.score["losses"],
-            self.score["ties"],
-            self.score["surrenders"],
+            self.score.wins, self.score.losses, self.score.ties, self.score.surrenders
         )
 
     def print_score(self):
@@ -45,16 +43,16 @@ class Game:
 
     def update_score(self):
         if self.win_state >= self.WIN:
-            self.score["wins"] += 1
+            self.score.wins += 1
 
         elif self.win_state == self.LOSS:
-            self.score["losses"] += 1
+            self.score.losses += 1
 
         elif self.win_state == self.TIE:
-            self.score["ties"] += 1
+            self.score.ties += 1
 
         elif self.win_state == self.SURRENDER:
-            self.score["surrenders"] += 1
+            self.score.surrenders += 1
 
         else:
             raise ValueError("Invalid game win state")
