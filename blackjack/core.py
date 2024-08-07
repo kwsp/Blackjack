@@ -1,25 +1,23 @@
 import numpy as np
 
 
-class Cards:
-    available_cards = ['A', 2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K']
-    JQK = ['J', 'Q', 'K']
-
-    @staticmethod
-    def new_card():
-        return Cards.available_cards[np.random.randint(13)]
+deck = ["A", 2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K"]
+JQK = ["J", "Q", "K"]
+deck_n = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 10, 10]
 
 
-class BasePlayer(Cards):
+def new_card():
+    return deck[np.random.randint(13)]
+
+
+class BasePlayer:
     def __init__(self):
-        self.cards = []
+        self.hand = []
         self.sum = np.zeros(1, dtype=np.uint8)
 
     def __repr__(self):
-        return "{}: cards {}, sum {})".format(
-                str(self.__class__).split(".")[-1].split("'")[0],
-                self.cards,
-                self.sum
+        return "{}: hand {}, sum {})".format(
+            str(self.__class__).split(".")[-1].split("'")[0], self.hand, self.sum
         )
 
     def __eq__(self, value):
@@ -39,20 +37,20 @@ class BasePlayer(Cards):
 
     def __call__(self):
         return {
-            "cards": self.cards,
+            "hand": self.hand,
             "sum": self.sum,
         }
 
     def deal(self):
         """Get a new hand
         """
-        self.cards = [self.new_card(), self.new_card()]
+        self.hand = [new_card(), new_card()]
         self.calc_sum()
 
     def hit(self):
         """Get a new card
         """
-        self.cards.append(self.new_card())
+        self.hand.append(new_card())
         self.calc_sum()
 
     def calc_sum(self):
@@ -60,31 +58,33 @@ class BasePlayer(Cards):
         """
         self.sum = np.zeros(1, dtype=np.uint8)
 
-        for val in self.cards:
+        for val in self.hand:
 
             # Handle non-numeric values
             if isinstance(val, str):
-                if val in self.JQK:
+                if val in JQK:
                     self.sum += 10
                 elif val == "A":
                     self.sum += 1
                     self.sum = np.append(self.sum, self.sum + 10)
                 else:
+                    breakpoint()
                     raise ValueError("Card not recognised.")
 
             # Numeric values
             elif isinstance(val, int):
                 self.sum += val
             else:
-                raise TypeError("Unrecognised type in cards array.")
+                breakpoint()
+                raise TypeError("Unrecognised type in hand array.")
 
     def print_cards(self, print_one=False):
-        lines = ['  '] * 4
-        cards = self.cards
+        lines = ["  "] * 4
+        hand = self.hand
         if print_one:
-            cards = cards[:1]
-            
-        for v in cards:
+            hand = hand[:1]
+
+        for v in hand:
             lines[0] += "   ____ "
             v = str(v)
             if len(v) == 2:
@@ -97,11 +97,10 @@ class BasePlayer(Cards):
         for l in lines:
             print(l)
 
-
     def clear(self):
         """Clear the hand
         """
-        self.cards = []
+        self.hand = []
         self.sum = np.zeros(1, dtype=np.uint8)
 
 
@@ -122,11 +121,12 @@ class Dealer(BasePlayer):
 
     fix [6, 3, 2, 'A']
     """
+
     def __init__(self):
         BasePlayer.__init__(self)
 
     def check_cards(self):
-        """Check if the dealer needs to draw new cards
+        """Check if the dealer needs to draw new hand
         """
         while True:
 
@@ -136,18 +136,15 @@ class Dealer(BasePlayer):
                 self.sum = 21
                 break
 
-            elif np.bitwise_and(
-                    (self.sum <= 21),
-                    (self.sum > 16)
-                ).any():
+            elif np.bitwise_and((self.sum <= 21), (self.sum > 16)).any():
                 """
-                If the dealer sum is larger than 16 and
-                smaller or equals to 21, store that sum
+                If the dealer sum is 17 or more and
+                not larger than 21, store that sum
                 """
                 self.sum = self.sum[self.sum > 16][0]
                 break
-            
-            elif (self.sum <=16).any():
+
+            elif (self.sum <= 16).any():
                 """
                 Dealer sum <= 16, hit again
                 """
@@ -155,4 +152,3 @@ class Dealer(BasePlayer):
                 if not (self.sum <= 21).any():
                     self.sum = self.sum[0]
                     break
-            

@@ -3,3 +3,7 @@
 *.pyc
 *~*
 *.sw?
+
+.coverage
+.coveragerc
+.vscode/

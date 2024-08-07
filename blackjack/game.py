@@ -1,10 +1,10 @@
 import time
-from core import Player, Dealer
+from .core import Player, Dealer
 
 
-# def print_cards(cards):
+# def print_cards(hand):
     # lines = ['  '] * 4
-    # for v in cards:
+    # for v in hand:
         # lines[0] += "   ____ "
         # v = str(v)
         # if len(v) == 2:
@@ -87,7 +87,7 @@ class Game():
         self.player.deal()
 
     def dcard(self):
-        return self.dealer.cards[0]
+        return self.dealer.hand[0]
     
     def hit(self):
         self.player.hit()
@@ -100,7 +100,7 @@ class Game():
             if self.win_state == self.SURRENDER:
                 print("You surrendered :)")
             elif self.win_state == self.WIN_1ST_RND:
-                print("Perfect 21 from your first 2 cards! Win! 1.5x return!")
+                print("Perfect 21 from your first 2 hand! Win! 1.5x return!")
 
         elif self.player > 21:
             print("You busted :(")
@@ -128,15 +128,15 @@ class Game():
     def play(self):
         self.clear_round()
         self.deal()
-        print("Dealer's cards: {}, *".format(self.dcard()))
+        print("Dealer's hand: {}, *".format(self.dcard()))
         self.dealer.print_cards(print_one=True)
 
         # Game loop
         while (self.player <= 21).any():
             print(self.player)
             self.player.print_cards()
-            if len(self.player.cards) == 2:
-                """First 2 cards dealt - check for 21 - able to surrender if cards are bad
+            if len(self.player.hand) == 2:
+                """First 2 hand dealt - check for 21 - able to surrender if hand are bad
                 """
                 if 21 in self.player.sum:
                     self.win_state = self.WIN_1ST_RND
@@ -150,12 +150,12 @@ class Game():
 
             if inp == "h":
                 self.hit()
-                print("Got a card: {}".format(self.player.cards[-1]))
+                print("Got a card: {}".format(self.player.hand[-1]))
             elif inp == "p":
                 break
             elif inp == "s":
                 # implement surrender
-                if len(self.player.cards) == 2:
+                if len(self.player.hand) == 2:
                     self.win_state = self.SURRENDER
                     break
                 else:
